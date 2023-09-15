@@ -77,7 +77,35 @@ export const constantRoutes = [
     ]
   },
 
-  
+  {
+    path: '/test',
+    component: Layout,
+    redirect: '/test/test1',
+    name: 'test',
+    meta: { title: '测试模块', icon: 'form' },
+    children: [
+      {
+        path: 'test1',
+        name: 'test1',
+        component: () => import('@/views/test/test1'),
+        meta: { title: '功能点一', icon: 'form' }
+      },
+      {
+        path: 'test2',
+        name: 'test2',
+        component: () => import('@/views/test/test2'),
+        meta: { title: '功能点二', icon: 'form' }
+      },
+      {
+        path: 'test3',
+        name: 'test3',
+        component: () => import('@/views/test/test3'),
+        meta: { title: '功能点三', icon: 'form' }
+      }
+    ]
+  },
+
+
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

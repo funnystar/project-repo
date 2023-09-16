@@ -1,1 +1,0 @@
-基于ElementUI、Vue、vue-element-admin、Springboot、MyBatis实现的管理系统

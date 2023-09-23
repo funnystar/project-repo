@@ -52,11 +52,11 @@
 
         <!-- 用户信息编辑对话框 -->
          <el-dialog @close="clearForm" :title="title" :visible.sync="dialogFormVisible">
-            <el-form :model="userForm">
-                <el-form-item label="用户名" :label-width="formLabelWidth">
+            <el-form :model="userForm" ref="userFromRef" :rules="rules">
+                <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
                     <el-input v-model="userForm.username" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item type="password" label="用户密码" :label-width="formLabelWidth">
+                <el-form-item type="password" prop="password" label="用户密码" :label-width="formLabelWidth">
                     <el-input v-model="userForm.password" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="联系电话" :label-width="formLabelWidth">
@@ -69,13 +69,13 @@
                         :inactive-value="0">
                     </el-switch>
                 </el-form-item>
-                <el-form-item label="电子邮件" :label-width="formLabelWidth">
+                <el-form-item label="电子邮件" prop="email" :label-width="formLabelWidth">
                     <el-input v-model="userForm.email" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                <el-button type="primary" @click="saveUser">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -85,6 +85,13 @@
 import userApi from '@/api/userManage'
 export default{
     data(){
+        var checkEmail = (rule, value, callback) => {
+            var reg = /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*\.[a-z]{2,}$/
+            if (!reg.test(value)) {
+            return callback(new Error('邮箱格式错误'));
+            }
+            callback;
+        };
         return{
             formLabelWidth:'130px',
             userForm:{},
@@ -95,12 +102,40 @@ export default{
                 pageNo: 1,
                 pageSize: 10
             },
-            userList:[]
+            userList:[],
+            rules:{
+                username: [
+                    { required: true, message: '请输入用户名称', trigger: 'blur' },
+                    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: '请输入初始登录密码', trigger: 'blur' },
+                    { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
+                ],
+                email: [
+                    { required: true, message: '请输入电子邮件', trigger: 'blur' },
+                    { validator: checkEmail, trigger: 'blur' }
+                ]
+            }
         }
     },
     methods:{
+        saveUser(){
+            // 触发表单验证
+            this.$refs[formName].validate((valid) => {
+            if (valid) {
+                // 提交请求给后台
+                
+            } else {
+                console.log('error submit!!');
+            return false;
+            }
+            });
+            // 提交请求给后台
+        },
         clearForm(){
             this.userForm = {};
+            this.$refs.userFromRef.clearValidate();
         },
         handleSizeChange(pageSize){
             this.searchModel.pageSize = pageSize;

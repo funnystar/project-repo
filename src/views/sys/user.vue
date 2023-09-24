@@ -9,7 +9,7 @@
                     <el-button @click="getUserList" type="primary" round icon="el-icon-search">查询</el-button>
                 </el-col>
                 <el-col :span="4" align="right">
-                    <el-button @click="openEditUI" type="primary" icon="el-icon-plus" circle></el-button>
+                    <el-button @click="openEditUI(null)" type="primary" icon="el-icon-plus" circle></el-button>
                 </el-col>
             </el-row>
         </el-card>
@@ -32,9 +32,19 @@
         </el-table-column>
         <el-table-column prop="phone" label="电话" width="180">
         </el-table-column>
+        <el-table-column prop="status" label="用户状态" width="180">
+            <template slot-scope="scope">
+                <el-tag v-if="scope.row.status == 1">正常</el-tag>
+                <el-tag v-else type="danger">禁用</el-tag>
+            </template>
+        </el-table-column>
         <el-table-column prop="email" label="电子邮件">
         </el-table-column>
         <el-table-column label="操作" width="180">
+            <template slot-scope="scope">
+                <el-button @click="openEditUI(scope.row.id)" type="primary" icon="el-icon-edit" circle></el-button>
+                <el-button @click="deleteUser(scope.row)" type="danger" icon="el-icon-delete" circle></el-button>
+            </template>
         </el-table-column>
       </el-table>
             </el-card>
@@ -52,12 +62,12 @@
 
         <!-- 用户信息编辑对话框 -->
          <el-dialog @close="clearForm" :title="title" :visible.sync="dialogFormVisible">
-            <el-form :model="userForm" ref="userFromRef" :rules="rules">
+            <el-form :model="userForm" ref="userFormRef" :rules="rules">
                 <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
                     <el-input v-model="userForm.username" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item type="password" prop="password" label="用户密码" :label-width="formLabelWidth">
-                    <el-input v-model="userForm.password" autocomplete="off"></el-input>
+                <el-form-item v-if="userForm.id == null || userForm.id == undefined" label="用户密码" prop="password" :label-width="formLabelWidth">
+                    <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="联系电话" :label-width="formLabelWidth">
                     <el-input v-model="userForm.phone" autocomplete="off"></el-input>
@@ -86,7 +96,7 @@ import userApi from '@/api/userManage'
 export default{
     data(){
         var checkEmail = (rule, value, callback) => {
-            var reg = /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*\.[a-z]{2,}$/
+            var reg = /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*@[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*\.[a-z]{2,}$/;
             if (!reg.test(value)) {
             return callback(new Error('邮箱格式错误'));
             }
@@ -120,22 +130,51 @@ export default{
         }
     },
     methods:{
+        deleteUser(user){
+        this.$confirm(`您确认删除用户 ${user.username} ?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            userApi.deleteUserById(user.id).then(response => {
+                this.$message({
+            type: 'success',
+            message: response.message
+            });
+            this.getUserList();
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+        },
         saveUser(){
             // 触发表单验证
-            this.$refs[formName].validate((valid) => {
+            this.$refs.userFormRef.validate((valid) => {
             if (valid) {
                 // 提交请求给后台
-                
+                userApi.saveUser(this.userForm).then(response => {
+                    // 成功提示
+                    this.$message({
+                    message: response.message,
+                    type: 'success'
+                    });
+                    // 关闭对话框
+                    this.dialogFormVisible = false;
+                    // 刷新表格
+                    this.getUserList;
+                });
             } else {
                 console.log('error submit!!');
-            return false;
+                return false;
             }
             });
-            // 提交请求给后台
         },
         clearForm(){
             this.userForm = {};
-            this.$refs.userFromRef.clearValidate();
+            this.$refs.userFormRef.clearValidate();
         },
         handleSizeChange(pageSize){
             this.searchModel.pageSize = pageSize;
@@ -152,8 +191,17 @@ export default{
 
             });
         },
-        openEditUI(){
-            this.title = "新增用户";
+        openEditUI(id){
+            this.dialogFormVisible = true;
+            if( id == null){
+                this.title = "新增用户";
+            }else{
+                this.title = "修改用户";
+                // 根据id查询用户数据
+                userApi.getUserById(id).then(response => {
+                    this.userForm = response.data;
+                });
+            }
             this.dialogFormVisible = true;
         }
     },

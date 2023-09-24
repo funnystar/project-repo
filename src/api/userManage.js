@@ -28,14 +28,13 @@ export default{
     });
   },
   saveUser(user){
-    if(user.id == null && user.id == undefined){
+    if(user.id == null || user.id == undefined){
       return this.addUser(user);
     }
     return this.updateUser(user);
   },
   getUserById(id){
     return request({
-      //url:'/user/' + id,
       url:`/user/${id}`,
       method:'get',
     });

@@ -69,10 +69,10 @@
                 <el-form-item v-if="userForm.id == null || userForm.id == undefined" label="用户密码" prop="password" :label-width="formLabelWidth">
                     <el-input type="password" v-model="userForm.password" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="联系电话" :label-width="formLabelWidth">
+                <el-form-item label="联系电话" prop="phone" :label-width="formLabelWidth">
                     <el-input v-model="userForm.phone" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="用户状态" :label-width="formLabelWidth">
+                <el-form-item label="用户状态" prop="status" :label-width="formLabelWidth">
                     <el-switch 
                         v-model="userForm.status"
                         :active-value="1"
@@ -100,7 +100,7 @@ export default{
             if (!reg.test(value)) {
             return callback(new Error('邮箱格式错误'));
             }
-            callback;
+            callback();
         };
         return{
             formLabelWidth:'130px',
@@ -150,9 +150,9 @@ export default{
           });          
         });
         },
-        saveUser(){
+        async saveUser(){
             // 触发表单验证
-            this.$refs.userFormRef.validate((valid) => {
+            this.$refs['userFormRef'].validate((valid) => {
             if (valid) {
                 // 提交请求给后台
                 userApi.saveUser(this.userForm).then(response => {
@@ -165,6 +165,8 @@ export default{
                     this.dialogFormVisible = false;
                     // 刷新表格
                     this.getUserList;
+                }).catch((error) => {
+                    console.log(error);
                 });
             } else {
                 console.log('error submit!!');

@@ -55,60 +55,7 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/sys',
-    component: Layout,
-    redirect: '/sys/user',
-    name: 'sysMange',
-    meta: { title: '系统管理', icon: 'sys' },
-    children: [
-      {
-        path: 'user',
-        name: 'user',
-        component: () => import('@/views/sys/user'),
-        meta: { title: '用户管理', icon: 'userManage' }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        component: () => import('@/views/sys/role'),
-        meta: { title: '角色管理', icon: 'roleManage' }
-      }
-    ]
-  },
-
-  {
-    path: '/test',
-    component: Layout,
-    redirect: '/test/test1',
-    name: 'test',
-    meta: { title: '测试模块', icon: 'form' },
-    children: [
-      {
-        path: 'test1',
-        name: 'test1',
-        component: () => import('@/views/test/test1'),
-        meta: { title: '功能点一', icon: 'form' }
-      },
-      {
-        path: 'test2',
-        name: 'test2',
-        component: () => import('@/views/test/test2'),
-        meta: { title: '功能点二', icon: 'form' }
-      },
-      {
-        path: 'test3',
-        name: 'test3',
-        component: () => import('@/views/test/test3'),
-        meta: { title: '功能点三', icon: 'form' }
-      }
-    ]
-  },
-
-
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  
 ]
 
 const createRouter = () => new Router({

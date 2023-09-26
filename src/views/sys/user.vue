@@ -144,7 +144,7 @@ export default{
         getAllRoleList(){
             roleApi.getAllRoleList().then(response => {
                 this.roleList = response.data;
-
+                console.log(this.roleList);
             });
         },
         deleteUser(user){
@@ -228,6 +228,7 @@ export default{
     },
     created(){
         this.getUserList();
+        this.getAllRoleList();
     }
 }
 </script>

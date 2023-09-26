@@ -45,7 +45,7 @@ export default{
     })
   },
   // 查询所有角色列表
-  getAllRole(){
+  getAllRoleList(){
     return request({
         url: '/role/all',
         method: 'get'

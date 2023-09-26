@@ -79,6 +79,13 @@
                         :inactive-value="0">
                     </el-switch>
                 </el-form-item>
+                <el-form-item label="用户角色" :label-width="formLabelWidth">
+                    <el-checkbox-group style="width: 85%;"
+                        v-model="userForm.roleIdList"
+                        :max="2">
+                        <el-checkbox v-for="role in roleList" :label="role.roleId" :key="role.roleId">{{role.roleDesc}}</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
                 <el-form-item label="电子邮件" prop="email" :label-width="formLabelWidth">
                     <el-input v-model="userForm.email" autocomplete="off"></el-input>
                 </el-form-item>
@@ -92,7 +99,8 @@
 </template>
 
 <script>
-import userApi from '@/api/userManage'
+import userApi from '@/api/userManage';
+import roleApi from '@/api/roleManage';
 export default{
     data(){
         var checkEmail = (rule, value, callback) => {
@@ -103,8 +111,11 @@ export default{
             callback();
         };
         return{
+            roleList: [],
             formLabelWidth:'130px',
-            userForm:{},
+            userForm: {
+                roleIdList: []
+            },
             dialogFormVisible:false,
             title:"",
             total:0,
@@ -130,6 +141,12 @@ export default{
         }
     },
     methods:{
+        getAllRoleList(){
+            roleApi.getAllRoleList().then(response => {
+                this.roleList = response.data;
+
+            });
+        },
         deleteUser(user){
         this.$confirm(`您确认删除用户 ${user.username} ?`, '提示', {
           confirmButtonText: '确定',
@@ -175,7 +192,9 @@ export default{
             });
         },
         clearForm(){
-            this.userForm = {};
+            this.userForm = {
+                roleIdList: []
+            };
             this.$refs.userFormRef.clearValidate();
         },
         handleSizeChange(pageSize){

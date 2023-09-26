@@ -64,8 +64,30 @@ export default {
   mounted() {
     this.initTags()
     this.addTags()
+    this.tagsViewCache()
   },
   methods: {
+    tagsViewCache() {
+        window.addEventListener("beforeunload", () => {
+            let tabViews = this.visitedViews.map(item => {
+                return {
+                    fullPath: item.fullPath,
+                    hash: item.hash,
+                    meta: { ...item.meta },
+                    name: item.name,
+                    params: { ...item.params },
+                    path: item.path,
+                    query: { ...item.query },
+                    title: item.title
+                };
+            });
+            sessionStorage.setItem("tabViews", JSON.stringify(tabViews));
+        });
+        let oldViews = JSON.parse(sessionStorage.getItem("tabViews")) || [];
+        if (oldViews.length > 0) {
+            this.$store.state.tagsView.visitedViews = oldViews;
+        }
+    },
     isActive(route) {
       return route.path === this.$route.path
     },
